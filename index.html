@@ -121,9 +121,17 @@
         }
 
         @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: .3; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .3;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
 
         #map {
@@ -145,7 +153,9 @@
         }
 
         @keyframes dash {
-            to { stroke-dashoffset: -20; }
+            to {
+                stroke-dashoffset: -20;
+            }
         }
 
         .timeline {
@@ -169,6 +179,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -185,109 +196,192 @@
 
             <div class="loader" id="loader">
                 Processing Shipment...
-                <div class="bar"><span id="progress"></span></div>
+
+                <div class="bar">
+                    <span id="progress"></span>
+                </div>
             </div>
 
             <div class="result" id="result">
 
                 <h2>Shipment Information</h2>
+
                 <div id="details"></div>
 
-                <h2 style="margin-top:25px;">Shipment Timeline</h2>
+                <h2 style="margin-top:25px;">
+                    Shipment Timeline
+                </h2>
 
                 <div class="timeline">
-                    <div><span>✓</span> Shipment received in United States</div>
-                    <div><span>✓</span> Departed United States</div>
-                    <div><span>✓</span>  at Morocco Transit Hub</div>
-                    <div><span>⏳</span> Currently in Transit</div>
-                    <div><span>○</span> Expected Delivery: South Africa</div>
+
+                    <div>
+                        <span>✓</span>
+                        Shipment received in United States
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Departed United States
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                         at African Hub
+                    </div>
+
+                    <div>
+                        <span>⏳</span>
+                        Currently in Transit
+                    </div>
+
+                    <div>
+                        <span>○</span>
+                        Expected Delivery: South Africa 
+                    </div>
+
                 </div>
 
-                <h2 style="margin-top:25px;">Shipment Route</h2>
+                <h2 style="margin-top:25px;">
+                    Shipment Route
+                </h2>
+
                 <div id="map"></div>
 
             </div>
 
-            <div class="footer">GDIC Logistics Tracking System</div>
+            <div class="footer">
+                GDIC Logistics Tracking System
+            </div>
 
         </div>
 
     </div>
 
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 
     <script>
 
         const TRACK_NUMBER = "773451267890";
 
+
         const shipmentDetails = [
+
             "<b>Status:</b> <span class='blink'>IN TRANSIT</span>",
+
             "<b>Sender Name:</b> Peter Sanchez",
+
             "<b>Origin:</b> United States",
+
             "<b>Transit Hub:</b> Morocco",
+
             "<b>Destination:</b> South Africa",
+
             "<b>Shipment Type:</b> International Express",
+
             "<b>Weight:</b> 0.9kg",
+
             "<b>Quantity:</b> 1 Parcel",
+
             "<hr>",
+
             "<b>Receiver Name:</b> Dennis Sambok",
-            "<b>Address:</b><br>Ucc Church Ground<De vlugy><br> avontuur Uniondale western Cape south Africa ",
+
+            "<b>Address:</b><br>" +
+            "Ucc Church Ground, De Vlugt, Avontuur, " +
+            "Uniondale, Western Cape, South Africa",
+
             "<b>Country:</b> South Africa 🇿🇦",
+
             "<b>Phone:</b> +27 76 139 0143"
+
         ];
+
 
         function trackShipment() {
 
-            const input = document.getElementById("tracking").value
+            const input = document
+                .getElementById("tracking")
+                .value
                 .trim()
                 .toUpperCase();
 
             const loader = document.getElementById("loader");
-            const progress = document.getElementById("progress");
-            const result = document.getElementById("result");
-            const details = document.getElementById("details");
+
+            const progress =
+                document.getElementById("progress");
+
+            const result =
+                document.getElementById("result");
+
+            const details =
+                document.getElementById("details");
+
 
             details.innerHTML = "";
+
             result.style.display = "none";
 
             loader.style.display = "block";
+
             progress.style.width = "0%";
 
+
             setTimeout(() => {
+
                 progress.style.width = "100%";
+
             }, 50);
+
 
             setTimeout(() => {
 
                 loader.style.display = "none";
 
+
                 if (input !== TRACK_NUMBER) {
+
                     alert("Invalid Tracking Number");
+
                     return;
+
                 }
+
 
                 result.style.display = "block";
 
+
                 let delay = 0;
+
 
                 shipmentDetails.forEach(item => {
 
                     setTimeout(() => {
 
-                        const div = document.createElement("div");
+                        const div =
+                            document.createElement("div");
+
                         div.className = "line";
+
                         div.innerHTML = item;
+
                         details.appendChild(div);
 
+
                         setTimeout(() => {
+
                             div.classList.add("show");
+
                         }, 20);
 
                     }, delay);
 
+
                     delay += 300;
 
                 });
+
 
                 setTimeout(createMap, delay);
 
@@ -295,82 +389,210 @@
 
         }
 
+
         function createMap() {
 
-            const map = L.map("map").setView([20, -15], 2);
+            const map =
+                L.map("map").setView([20, -15], 2);
+
 
             L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                { attribution: "© OpenStreetMap" }
+                {
+                    attribution: "© OpenStreetMap"
+                }
             ).addTo(map);
 
-            const usa = [40.7128, -74.0060];
-            const morocco = [33.5731, -7.5898];
-            const South Africa = [-30.5595, 22.9375];
 
-            L.marker(usa).addTo(map).bindPopup("Origin: United States");
-            L.marker(morocco).addTo(map).bindPopup("Transit Hub: Morocco");
-            L.marker(South Africa).addTo(map).bindPopup("Destination: South Africa");
+            const usa = [
+                40.7128,
+                -74.0060
+            ];
 
-            const route = L.polyline([usa, morocco, botswana], {
-                color: "red",
-                weight: 5,
-                className: "route"
-            }).addTo(map);
 
-            map.fitBounds(route.getBounds());
+            const morocco = [
+                33.5731,
+                -7.5898
+            ];
 
-            [usa, morocco, botswana].forEach(pt => {
+
+            const southAfrica = [
+                -30.5595,
+                22.9375
+            ];
+
+
+            L.marker(usa)
+                .addTo(map)
+                .bindPopup(
+                    "Origin: United States"
+                );
+
+
+            L.marker(morocco)
+                .addTo(map)
+                .bindPopup(
+                    "Transit Hub: Morocco"
+                );
+
+
+            L.marker(southAfrica)
+                .addTo(map)
+                .bindPopup(
+                    "Destination: South Africa"
+                );
+
+
+            const route =
+                L.polyline(
+                    [
+                        usa,
+                        morocco,
+                        southAfrica
+                    ],
+                    {
+                        color: "red",
+                        weight: 5,
+                        className: "route"
+                    }
+                ).addTo(map);
+
+
+            map.fitBounds(
+                route.getBounds()
+            );
+
+
+            [
+                usa,
+                morocco,
+                southAfrica
+            ].forEach(pt => {
+
                 L.circleMarker(pt, {
+
                     radius: 8,
+
                     color: "#ffffff",
+
                     fillColor: "#ff0000",
+
                     fillOpacity: 1
+
                 }).addTo(map);
+
             });
 
-            const planeIcon = L.divIcon({
-                className: "",
-                html: "✈️",
-                iconSize: [30, 30]
-            });
 
-            const plane = L.marker(usa, { icon: planeIcon }).addTo(map);
+            const planeIcon =
+                L.divIcon({
 
-            const routePoints = [usa, morocco, botswana];
+                    className: "",
+
+                    html: "✈️",
+
+                    iconSize: [
+                        30,
+                        30
+                    ]
+
+                });
+
+
+            const plane =
+                L.marker(
+                    usa,
+                    {
+                        icon: planeIcon
+                    }
+                ).addTo(map);
+
+
+            const routePoints = [
+
+                usa,
+
+                morocco,
+
+                southAfrica
+
+            ];
+
+
             let currentPoint = 0;
 
+
             setInterval(() => {
+
                 currentPoint++;
-                if (currentPoint >= routePoints.length) {
-                    currentPoint = routePoints.length - 1;
+
+
+                if (
+                    currentPoint >=
+                    routePoints.length
+                ) {
+
+                    currentPoint =
+                        routePoints.length - 1;
+
                 }
-                plane.setLatLng(routePoints[currentPoint]);
+
+
+                plane.setLatLng(
+                    routePoints[currentPoint]
+                );
+
+
             }, 3000);
+
         }
 
+
         setTimeout(() => {
-            const result = document.getElementById("result");
+
+            const result =
+                document.getElementById("result");
+
             if (result) {
+
                 result.style.display = "none";
+
             }
+
         }, 120000);
 
+
         window.onload = function () {
-            document.getElementById("tracking").focus();
+
+            document
+                .getElementById("tracking")
+                .focus();
+
         };
+
 
         document
             .getElementById("tracking")
-            .addEventListener("keypress", function (e) {
-                if (e.key === "Enter") {
-                    trackShipment();
-                }
-            });
+            .addEventListener(
+                "keypress",
+                function (e) {
 
-        console.log("GDIC Logistics Tracking System Loaded Successfully.");
+                    if (e.key === "Enter") {
+
+                        trackShipment();
+
+                    }
+
+                }
+            );
+
+
+        console.log(
+            "GDIC Logistics Tracking System Loaded Successfully."
+        );
 
     </script>
 
 </body>
+
 </html>
