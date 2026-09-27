@@ -190,9 +190,12 @@
 
             <h2>Track Your Shipment</h2>
 
-            <input id="tracking" placeholder="Enter Tracking Number">
+            <input id="tracking"
+                placeholder="Enter Tracking Number">
 
-            <button onclick="trackShipment()">TRACK SHIPMENT</button>
+            <button onclick="trackShipment()">
+                TRACK SHIPMENT
+            </button>
 
             <div class="loader" id="loader">
                 Processing Shipment...
@@ -226,17 +229,17 @@
 
                     <div>
                         <span>✓</span>
-                         at African Hub
+                        Proccessing
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Currently in transit 
                     </div>
 
                     <div>
                         <span>⏳</span>
-                        Currently:in South africa
-                    </div>
-
-                    <div>
-                        <span>○</span>
-                        Expected Delivery: South Africa 
+                        Expected Delivery: Molepolole, Botswana
                     </div>
 
                 </div>
@@ -257,49 +260,57 @@
 
     </div>
 
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-
     <script>
+
+        /* ==============================
+           TRACKING NUMBER
+        ============================== */
 
         const TRACK_NUMBER = "A773451267890";
 
 
+        /* ==============================
+           SHIPMENT DETAILS
+        ============================== */
+
         const shipmentDetails = [
 
-            "<b>Status:</b> <span class='blink'>ON HOLD</span>",
+            "<b>Status:</b> <span class='blink'>IN HOLD</span>",
 
             "<b>Sender Name:</b> Peter Sanchez",
 
             "<b>Origin:</b> United States",
 
-            "<b>Transit Hub:</b> left Morocco ",
+            "<b>Transit Hub:</b> Morocco",
 
-            "<b>Destination:</b> South Africa",
+            "<b>Destination:</b> Botswana",
 
             "<b>Shipment Type:</b> International Express",
 
-            "<b>Weight:</b> 0.9kg",
+            "<b>Weight:</b> 0.198kg",
 
             "<b>Quantity:</b> 1 Parcel",
 
             "<hr>",
 
-            "<b>Receiver Name:</b> Dennis Sambok",
+            "<b>Receiver Name:</b> Tshepo Obotsang",
 
             "<b>Address:</b><br>" +
-            "Ucc Church Ground, De Vlugt, Avontuur, " +
-            "Uniondale, Western Cape, South Africa",
+            "Plot No 31277 Molepolole<br>" +
+            "Botswana",
 
-            "<b>Country:</b> South Africa 🇿🇦",
+            "<b>Country:</b> Botswana 🇧🇼",
 
-            "<b>Phone:</b> +27 76 139 0143",
-            "<b>Agent Assigned:</b> Mr mike Togba"
-            
+            "<b>Phone:</b> +267 73 061 012"
 
         ];
 
+
+        /* ==============================
+           TRACK SHIPMENT
+        ============================== */
 
         function trackShipment() {
 
@@ -309,7 +320,8 @@
                 .trim()
                 .toUpperCase();
 
-            const loader = document.getElementById("loader");
+            const loader =
+                document.getElementById("loader");
 
             const progress =
                 document.getElementById("progress");
@@ -392,10 +404,14 @@
         }
 
 
+        /* ==============================
+           CREATE MAP
+        ============================== */
+
         function createMap() {
 
             const map =
-                L.map("map").setView([20, -15], 2);
+                L.map("map").setView([5, 10], 3);
 
 
             L.tileLayer(
@@ -406,11 +422,15 @@
             ).addTo(map);
 
 
+            /* USA */
+
             const usa = [
                 40.7128,
                 -74.0060
             ];
 
+
+            /* MOROCCO */
 
             const morocco = [
                 33.5731,
@@ -418,40 +438,76 @@
             ];
 
 
+            /* SOUTH AFRICA */
+
             const southAfrica = [
                 -30.5595,
                 22.9375
             ];
 
 
+            /* MOLEPOLOLE, BOTSWANA */
+
+            const botswana = [
+                -24.4066,
+                25.4951
+            ];
+
+
+            /* ==============================
+               MARKERS
+            ============================== */
+
             L.marker(usa)
                 .addTo(map)
                 .bindPopup(
-                    "Origin: United States"
+                    "<b>Origin</b><br>United States"
                 );
 
 
             L.marker(morocco)
                 .addTo(map)
                 .bindPopup(
-                    "Transit Hub: Morocco"
+                    "<b>Transit Hub</b><br>Morocco"
                 );
 
 
             L.marker(southAfrica)
                 .addTo(map)
                 .bindPopup(
-                    "Destination: South Africa"
+                    "<b>Transit Point</b><br>South Africa"
                 );
+
+
+            L.marker(botswana)
+                .addTo(map)
+                .bindPopup(
+                    "<b>Destination</b><br>" +
+                    "Plot No 31277 Molepolole<br>" +
+                    "Botswana"
+                );
+
+
+            /* ==============================
+               ROUTE
+            ============================== */
+
+            const routePoints = [
+
+                usa,
+
+                morocco,
+
+                southAfrica,
+
+                botswana
+
+            ];
 
 
             const route =
                 L.polyline(
-                    [
-                        usa,
-                        morocco,
-                        southAfrica
-                    ],
+                    routePoints,
                     {
                         color: "red",
                         weight: 5,
@@ -460,18 +516,13 @@
                 ).addTo(map);
 
 
-            map.fitBounds(
-                route.getBounds()
-            );
+            /* ==============================
+               ROUTE DOTS
+            ============================== */
 
+            routePoints.forEach((point, index) => {
 
-            [
-                usa,
-                morocco,
-                southAfrica
-            ].forEach(pt => {
-
-                L.circleMarker(pt, {
+                L.circleMarker(point, {
 
                     radius: 8,
 
@@ -481,21 +532,49 @@
 
                     fillOpacity: 1
 
-                }).addTo(map);
+                })
+                .addTo(map);
 
             });
 
 
+            /* ==============================
+               FIT MAP TO ROUTE
+            ============================== */
+
+            map.fitBounds(
+                route.getBounds(),
+                {
+                    padding: [30, 30]
+                }
+            );
+
+
+            /* ==============================
+               MOVING TRACKING MARKER
+            ============================== */
+
             const planeIcon =
                 L.divIcon({
 
-                    className: "",
+                    className: "moving-plane",
 
-                    html: "✈️",
+                    html: `
+                        <div style="
+                            font-size: 28px;
+                            text-shadow:
+                            0 0 3px white;
+                        ">✈️</div>
+                    `,
 
                     iconSize: [
                         30,
                         30
+                    ],
+
+                    iconAnchor: [
+                        15,
+                        15
                     ]
 
                 });
@@ -503,66 +582,94 @@
 
             const plane =
                 L.marker(
-                    usa,
+                    routePoints[0],
                     {
                         icon: planeIcon
                     }
                 ).addTo(map);
 
 
-            const routePoints = [
+            /* ==============================
+               SMOOTH ROUTE ANIMATION
+            ============================== */
 
-                usa,
+            let segment = 0;
 
-                morocco,
+            let progress = 0;
 
-                southAfrica
-
-            ];
-
-
-            let currentPoint = 0;
+            const speed = 0.005;
 
 
-            setInterval(() => {
-
-                currentPoint++;
-
+            function animatePlane() {
 
                 if (
-                    currentPoint >=
-                    routePoints.length
+                    segment >=
+                    routePoints.length - 1
                 ) {
 
-                    currentPoint =
-                        routePoints.length - 1;
+                    segment = 0;
+
+                    progress = 0;
+
+                    plane.setLatLng(
+                        routePoints[0]
+                    );
 
                 }
 
 
-                plane.setLatLng(
-                    routePoints[currentPoint]
+                const start =
+                    routePoints[segment];
+
+                const end =
+                    routePoints[segment + 1];
+
+
+                progress += speed;
+
+
+                if (progress >= 1) {
+
+                    progress = 0;
+
+                    segment++;
+
+                }
+
+
+                const lat =
+                    start[0] +
+                    (end[0] - start[0])
+                    * progress;
+
+
+                const lng =
+                    start[1] +
+                    (end[1] - start[1])
+                    * progress;
+
+
+                plane.setLatLng([
+                    lat,
+                    lng
+                ]);
+
+
+                requestAnimationFrame(
+                    animatePlane
                 );
 
+            }
 
-            }, 3000);
+
+            animatePlane();
 
         }
 
 
-        setTimeout(() => {
-
-            const result =
-                document.getElementById("result");
-
-            if (result) {
-
-                result.style.display = "none";
-
-            }
-
-        }, 120000);
-
+        /* ==============================
+           PAGE SETUP
+        ============================== */
 
         window.onload = function () {
 
